@@ -1,0 +1,59 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0"
+    }
+}
+
+plugins {
+    id "java"
+    id "idea"
+    id "eclipse"
+}
+
+sourceCompatibility = "16"
+targetCompatibility = "16"
+version = "0.0.1"
+
+repositories {
+    mavenCentral()
+
+    maven {
+        url "https://packages.confluent.io/maven"
+    }
+}
+
+apply plugin: "java"
+apply plugin: "com.github.johnrengelman.shadow"
+
+dependencies {
+    implementation "org.slf4j:slf4j-simple:1.7.30"
+    implementation "org.apache.kafka:kafka-streams:2.7.0"
+    implementation "commons-lang:commons-lang:2.6"
+    testImplementation "junit:junit:4.13.2"
+    testImplementation 'org.hamcrest:hamcrest:2.2'
+}
+
+test {
+    testLogging {
+        outputs.upToDateWhen { false }
+        showStandardStreams = true
+        exceptionFormat = "full"
+    }
+}
+
+jar {
+    manifest {
+        attributes(
+                "Class-Path": configurations.compileClasspath.collect { it.getName() }.join(" "),
+                "Main-Class": "com.lambdasys.developer.KafkaProducerApplication"
+        )
+    }
+}
+
+shadowJar {
+    archiveBaseName = "message-ordering-standalone"
+    archiveClassifier = ''
+}
